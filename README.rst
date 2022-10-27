@@ -1,5 +1,5 @@
-pymodaq_plugins_template (??? Instruments)
-##########################################
+pymodaq_plugins_ophir (Nova II console)
+#######################################
 
 .. the following must be adapted to your developped package, links to pypi, github  description...
 
@@ -15,13 +15,13 @@ pymodaq_plugins_template (??? Instruments)
    :target: https://github.com/PyMoDAQ/pymodaq_plugins_thorlabs
    :alt: Publication Status
 
-Set of PyMoDAQ plugins for instruments from ???
+Set of PyMoDAQ plugins for instruments from Ophir (www.ophiropt.com)
 
 
 Authors
 =======
 
-* First Author  (myemail@xxx.org)
+* Frank Wagner  (frank.wagner@fresnel.fr)
 * Other author (myotheremail@xxx.org)
 
 .. if needed use this field

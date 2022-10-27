@@ -1,14 +1,14 @@
 ## To modify by developper(s) of the plugin
 
 [plugin-info]
-SHORT_PLUGIN_NAME = 'template'  #to be modified, for instance daqmx then rename the module name:
+SHORT_PLUGIN_NAME = 'ophir'  #to be modified, for instance daqmx then rename the module name:
 # (pymodaq_plugins_template become pymodaq_plugins_daqmx for instance)
 
-package-url = 'https://github.com/PyMoDAQ/pymodaq_plugins_template' #to modify
-description = 'some word about your plugin'
+package-url = 'https://github.com/PyMoDAQ/pymodaq_plugins_ophir' #to modify
+description = 'Should once connect the Ophir Nova II console to PyMoDaq'
 
-author = 'Author Name'
-author-email = 'Author email'
+author = 'Frank Wagner'
+author-email = 'frank.wagner@fresnel.fr'
 license = 'MIT'
 
 [plugin-install]
