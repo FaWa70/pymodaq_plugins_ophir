@@ -9,7 +9,7 @@ class PythonWrapperOfYourInstrument:
     pass
 
 
-class DAQ_0DViewer_Template(DAQ_Viewer_base):
+class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
     """
     """
     params = comon_parameters+[
@@ -116,4 +116,5 @@ class DAQ_0DViewer_Template(DAQ_Viewer_base):
 
 
 if __name__ == '__main__':
-    main(__file__)
+    # main(__file__)  # starts with automatic initialization
+    main(__file__, False)  # waits for manual initialization
