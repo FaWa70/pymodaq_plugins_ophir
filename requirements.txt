@@ -1,0 +1,7 @@
+pymodaq~=3.6.8
+numpy~=1.23.4
+easydict~=1.10
+toml~=0.10.2
+setuptools~=63.4.1
+pywin32~=302  # TODO : add in description as well as
+# starlab (or Ophir Com object) and its dependencies like C distributuable
