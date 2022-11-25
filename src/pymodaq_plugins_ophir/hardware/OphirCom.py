@@ -16,6 +16,7 @@ try:
     # Scan for connected Devices
     DeviceList = OphirCOM.ScanUSB()
     print(f"{DeviceList=}")
+    print("nb of devices = ", len(DeviceList))
     for Device in DeviceList:  # if any device is connected
         DeviceHandle = OphirCOM.OpenUSBDevice(Device)  # open first device
         exists = OphirCOM.IsSensorExists(DeviceHandle, 0)
@@ -28,7 +29,7 @@ try:
             # For PE25-C: ranges = (0, ('10.0J', '2.00J', '200mJ', '20.0mJ', '2.00mJ', '200uJ'))
             # The first entry, ranges[0], is the index of the active range in ranges[1]
             # new_range replaces ranges[0]
-            new_range = 5  # For this head this corresponds to 200uJ
+            new_range = 2  # For this head this corresponds to 200uJ
             print(f"{ranges[1][new_range]=}")
             # set new range
             OphirCOM.SetRange(DeviceHandle, 0, new_range)

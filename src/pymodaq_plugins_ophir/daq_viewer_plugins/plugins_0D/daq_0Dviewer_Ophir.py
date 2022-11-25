@@ -3,26 +3,26 @@ from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq.utils.data import DataFromPlugins
 from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, comon_parameters, main
 from pymodaq.utils.parameter import Parameter
-
-class PythonWrapperOfYourInstrument:
-    #  TODO Replace this fake class with the import of the real python wrapper of your instrument
-    pass
+from pymodaq_plugins_ophir.hardware.OphirPowermeter import Ophir1Powermeter
 
 
 class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
     """
     """
-    params = comon_parameters+[
-        ## TODO for your custom plugin: elements to be added here as dicts in order to control your custom stage
-        ]
+    params = comon_parameters + [
+        {'title': 'Ophir console info', 'name': 'c_info', 'type': 'str',
+         'value': 'notyetknown'},
+        {'title': 'Ophir sensor info', 'name': 's_info', 'type': 'str',
+         'value': 'notyetknown'},
+        {'title': 'Wavelength', 'name': 'w_length', 'type': 'list',
+         'limits': ['pos1', 'pos2'], 'tip': 'Choose your laser WL. If not present use console.'},
+        {'title': 'Range', 'name': 'm_range', 'type': 'list',
+         'limits': ['pos1', 'pos2'], 'tip': 'Choose a range that triggers without saturating.'}
+    ]
 
     def ini_attributes(self):
-        #  TODO declare the type of the wrapper (and assign it to self.controller) you're going to use for easy
-        #  autocompletion
-        self.controller: PythonWrapperOfYourInstrument = None
-
-        #TODO declare here attributes you want/need to init with a default value
-        pass
+        self.controller: Ophir1Powermeter = None
+        # Declare here attributes you want/need to init with a default value
 
     def commit_settings(self, param: Parameter):
         """Apply the consequences of a change of value in the detector settings
@@ -32,11 +32,14 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
         param: Parameter
             A given parameter (within detector_settings) whose value has been changed by the user
         """
-        ## TODO for your custom plugin
-        if param.name() == "a_parameter_you've_added_in_self.params":
-           self.controller.your_method_to_apply_this_param_change()  # when writing your own plugin replace this line
-#        elif ...
-        ##
+        if param.name() == "w_length":
+            self.controller.wavelength = param.value()
+        elif param.name() == "m_range":
+            self.controller.range = param.value()
+        else:
+            print("Parameter change not yet implemented")
+        # Attention sometimes changing a parameter triggers a reading.
+        # Maybe delete the generated reading if it was caused by this parameter change action.
 
     def ini_detector(self, controller=None):
         """Detector communication initialization
@@ -44,8 +47,8 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
         Parameters
         ----------
         controller: (object)
-            custom object of a PyMoDAQ plugin (Slave case). None if only one actuator/detector by controller
-            (Master case)
+            custom object of a PyMoDAQ plugin (Slave case).
+            None if only one actuator/detector is used by this controller (Master case)
 
         Returns
         -------
@@ -53,25 +56,34 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
         initialized: bool
             False if initialization failed otherwise True
         """
-
-        raise NotImplemented  # TODO when writing your own plugin remove this line and modify the one below
         self.ini_detector_init(old_controller=controller,
-                               new_controller=PythonWrapperOfYourInstrument())
+                               new_controller=Ophir1Powermeter())
 
-        # TODO for your custom plugin (optional) initialize viewers panel with the future type of data
-        self.data_grabed_signal_temp.emit([DataFromPlugins(name='Mock1',data=[np.array([0]), np.array([0])],
-                                                           dim='Data0D',
-                                                           labels=['Mock1', 'label2'])])
+        initialized = self.controller.open_communication()  # tries to open comm ?? again ??
 
-        info = "Whatever info you want to log"
-        initialized = self.controller.a_method_or_atttribute_to_check_if_init()  # TODO
+        if initialized:
+            # Get the values to put in parameters (at startup)
+            self.settings.child('c_info').setValue(self.controller.oph_device_name)  # sting
+            self.settings.child('s_info').setValue(self.controller.oph_sensor_name)  # float
+            self.settings.child('w_length').setLimits(self.controller.wavelength_list)  # populate the list
+            self.settings.child('w_length').setValue(self.controller.wavelength)  # display this item
+            self.settings.child('m_range').setLimits(self.controller.range_list)  # populate the list
+            self.settings.child('m_range').setValue(self.controller.range)  # display this item
+            # self.settings.child('peak_amp').setValue(self.controller.amplitude)  # float
+
+            self.data_grabed_signal_temp.emit(
+                [DataFromPlugins(name='Pyro', data=[np.array([0])],
+                                 dim='Data0D', labels=['pyro1'])]
+            )
+
+            info = "Ophir console and detector successfully initialized"
+        else:
+            info = "Ophir console could not be initialized"
         return info, initialized
 
     def close(self):
         """Terminate the communication protocol"""
-        ## TODO for your custom plugin
-        raise NotImplemented  # when writing your own plugin remove this line
-        #  self.controller.your_method_to_terminate_the_communication()  # when writing your own plugin replace this line
+        self.controller.close_communication()
 
     def grab_data(self, Naverage=1, **kwargs):
         """Start a grab from the detector
@@ -95,9 +107,9 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
 
         # asynchrone version (non-blocking function with callback)
         raise NotImplemented  # when writing your own plugin remove this line
-        self.controller.your_method_to_start_a_grab_snap(self.callback)  # when writing your own plugin replace this line
+        self.controller.your_method_to_start_a_grab_snap(
+            self.callback)  # when writing your own plugin replace this line
         #########################################################
-
 
     def callback(self):
         """optional asynchrone method called when the detector has finished its acquisition of data"""
@@ -116,5 +128,5 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
 
 
 if __name__ == '__main__':
-    # main(__file__)  # starts with automatic initialization
-    main(__file__, False)  # waits for manual initialization
+    main(__file__)  # starts with automatic initialization
+    # main(__file__, False)  # waits for manual initialization

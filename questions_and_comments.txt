@@ -1,7 +1,30 @@
 Questions:
-
+--------------------------------------------------------------------------------
 * Can one plugin viewer file "daq_0Dviewer_Ophir.py" contain more than one viewer Class?
 (like "class DAQ_0DViewer_Ophir(DAQ_Viewer_base):")
 And if yes, are there restrictions on the names?
 Import to the list of possible instruments ?
+--------------------------------------------------------------------------------
+* Running daq_0Dviewer_ophir.py raises this error:
+      File "C:\_DATA\RECHERCHE\Lab material\pymodaq_plugins_ophir\src\pymodaq_plugins_ophir\hardware\OphirPowermeter.py", line 37, in open_communication
+        self._ophir_com = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
+    ...
+    pywintypes.com_error: (-2147221008, 'CoInitialize n’a pas été appelé.', None, None)
+    Lines 36 and 37 in hardware\OphirPowermeter.py are:
+        try:
+            self._ophir_com = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
+
+Running OphirPowermeter.py alone does not raise the error.
+
+Solution:
+I guess that you have to initialize COM in every thread you work with it
+(again I'm not sure about every COM compartment).
+As CherryPy is threaded servers your requests are handled
+by different threads, not one you bootstrap with. So I suggest you to try the
+following in your bootstrap routine:
+
+import pythoncom
+pythoncom.CoInitialize()
+-----------------------------------------------------------------------------------
+
 
