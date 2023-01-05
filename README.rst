@@ -55,16 +55,11 @@ Instruments
 
 Below is the list of instruments included in this plugin
 
-Actuators
-+++++++++
-
-* **yyy**: control of yyy actuators
-* **xxx**: control of xxx actuators
-
 Viewer0D
 ++++++++
 
-* **yyy**: control of yyy 0D detector
+* **Ophir1EnergyMeter**: Control of Ophir Laser Energy Meter 0D detector
+(Tested with a Nova II console and pyroelectric detectors)
 * **xxx**: control of xxx 0D detector
 
 Viewer1D

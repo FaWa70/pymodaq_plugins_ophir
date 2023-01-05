@@ -5,9 +5,9 @@
 import win32com.client  # conda install -c anaconda pywin32
 import pythoncom
 import traceback
+import time
 
-
-class Ophir1Powermeter:  # Works if there is only ONE powermeter connected
+class Ophir1EnergyMeter:  # Works if there is only ONE powermeter connected
     info = 'Wrapper for the interface with Ophir power meter console Nova2 0.0.1'
     # Any class variables ?
 
@@ -26,6 +26,7 @@ class Ophir1Powermeter:  # Works if there is only ONE powermeter connected
         self._range_idx = None
         self._wavelength_list = None
         self._wavelength_idx = None
+        self._started = False
 
     def open_communication(self):
         """
@@ -82,9 +83,24 @@ class Ophir1Powermeter:  # Works if there is only ONE powermeter connected
         self._ophir_com = None
         return True
 
-    def start_acq(self):
-        # TODO: make this work
-        pass
+    def get_data_1meas(self):
+        print('get_data_1meas called')
+        if not self._started:
+            self._ophir_com.StartStream(self._oph_device_handle, 0)  # start measuring
+            self._started = True
+            print('started stream')
+
+        data = self._ophir_com.GetData(self._oph_device_handle, 0)
+        if len(data[0]) > 0:  # if any data available, print the first one from the batch
+            print(
+                'Reading = {0}, TimeStamp = {1}, Status = {2} '.format(
+                    data[0][0], data[1][0], data[2][0]))
+            return data[0][0]
+        else:
+            return None
+
+    def stop_streams(self):
+        self._ophir_com.StopAllStreams()
 
     @property
     def oph_device_name(self):
@@ -178,7 +194,12 @@ class Ophir1Powermeter:  # Works if there is only ONE powermeter connected
             print(f"new wavelength is {self.wavelength}")  # this calls the property getter self.wavelength
 
 if __name__ == '__main__':
-    ophir_1_powermeter = Ophir1Powermeter()
+    ophir_1_powermeter = Ophir1EnergyMeter()
     ophir_1_powermeter.open_communication()
+    for i in range(10):
+        time.sleep(0.8)  # wait a little for data
+        dattta = ophir_1_powermeter.get_data_1meas()
+        print(dattta)
+    ophir_1_powermeter.stop_streams()
     ophir_1_powermeter.close_communication()
 

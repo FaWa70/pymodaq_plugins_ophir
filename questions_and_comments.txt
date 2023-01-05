@@ -3,7 +3,7 @@ Questions:
 * Can one plugin viewer file "daq_0Dviewer_Ophir.py" contain more than one viewer Class?
 (like "class DAQ_0DViewer_Ophir(DAQ_Viewer_base):")
 And if yes, are there restrictions on the names?
-Import to the list of possible instruments ?
+Import to the list of possible instruments ? This is somehow suggested in the README.rst file
 --------------------------------------------------------------------------------
 * Running daq_0Dviewer_ophir.py raises this error:
       File "C:\_DATA\RECHERCHE\Lab material\pymodaq_plugins_ophir\src\pymodaq_plugins_ophir\hardware\OphirPowermeter.py", line 37, in open_communication

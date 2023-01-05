@@ -3,7 +3,7 @@ from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq.utils.data import DataFromPlugins
 from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, comon_parameters, main
 from pymodaq.utils.parameter import Parameter
-from pymodaq_plugins_ophir.hardware.OphirPowermeter import Ophir1Powermeter
+from pymodaq_plugins_ophir.hardware.OphirPowermeter import Ophir1EnergyMeter
 
 
 class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
@@ -21,7 +21,7 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
     ]
 
     def ini_attributes(self):
-        self.controller: Ophir1Powermeter = None
+        self.controller: Ophir1EnergyMeter = None
         # Declare here attributes you want/need to init with a default value
 
     def commit_settings(self, param: Parameter):
@@ -57,14 +57,14 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
             False if initialization failed otherwise True
         """
         self.ini_detector_init(old_controller=controller,
-                               new_controller=Ophir1Powermeter())
+                               new_controller=Ophir1EnergyMeter())
 
         initialized = self.controller.open_communication()  # tries to open comm ?? again ??
 
         if initialized:
             # Get the values to put in parameters (at startup)
-            self.settings.child('c_info').setValue(self.controller.oph_device_name)  # sting
-            self.settings.child('s_info').setValue(self.controller.oph_sensor_name)  # float
+            self.settings.child('c_info').setValue(self.controller.oph_device_name)  # string
+            self.settings.child('s_info').setValue(self.controller.oph_sensor_name)  # string
             self.settings.child('w_length').setLimits(self.controller.wavelength_list)  # populate the list
             self.settings.child('w_length').setValue(self.controller.wavelength)  # display this item
             self.settings.child('m_range').setLimits(self.controller.range_list)  # populate the list
@@ -94,22 +94,19 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
             Number of hardware averaging (if hardware averaging is possible, self.hardware_averaging should be set to
             True in class preamble and you should code this implementation)
         kwargs: dict
-            others optionals arguments
+            others optional arguments
         """
-        ## TODO for your custom plugin
-
         # synchrone version (blocking function)
-        raise NotImplemented  # when writing your own plugin remove this line
-        data_tot = self.controller.your_method_to_start_a_grab_snap()
-        self.data_grabed_signal.emit([DataFromPlugins(name='Mock1', data=data_tot,
-                                                      dim='Data0D', labels=['dat0', 'data1'])])
-        #########################################################
+        data_tot = self.controller.get_data_1meas()
+        print(data_tot)
+        self.data_grabed_signal.emit([DataFromPlugins(name='Pyro', data=data_tot,
+                                                      dim='Data0D', labels=['pyro1'])])
 
-        # asynchrone version (non-blocking function with callback)
+        """# asynchrone version (non-blocking function with callback)
         raise NotImplemented  # when writing your own plugin remove this line
         self.controller.your_method_to_start_a_grab_snap(
             self.callback)  # when writing your own plugin replace this line
-        #########################################################
+        #########################################################"""
 
     def callback(self):
         """optional asynchrone method called when the detector has finished its acquisition of data"""
@@ -119,9 +116,7 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
 
     def stop(self):
         """Stop the current grab hardware wise if necessary"""
-        ## TODO for your custom plugin
-        raise NotImplemented  # when writing your own plugin remove this line
-        self.controller.your_method_to_stop_acquisition()  # when writing your own plugin replace this line
+        self.controller.stop_streams()  # when writing your own plugin replace this line
         self.emit_status(ThreadCommand('Update_Status', ['Some info you want to log']))
         ##############################
         return ''
