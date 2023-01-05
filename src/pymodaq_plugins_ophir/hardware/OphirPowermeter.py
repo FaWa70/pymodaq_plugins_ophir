@@ -83,6 +83,10 @@ class Ophir1EnergyMeter:  # Works if there is only ONE powermeter connected
         self._ophir_com = None
         return True
 
+    def set_immediate_mode(self):
+        self._ophir_com.ConfigureStreamMode(self._oph_device_handle, 0, 2, 1)
+        return
+
     def get_data_1meas(self):
         print('get_data_1meas called')
         if not self._started:
