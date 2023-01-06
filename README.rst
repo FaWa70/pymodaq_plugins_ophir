@@ -60,6 +60,22 @@ Viewer0D
 
 * **Ophir1EnergyMeter**: Control of Ophir Laser Energy Meter 0D detector
 (Tested with a Nova II console and pyroelectric detectors)
+
+There is one Git branch for each stream mode:
+
+- Standard mode:
+The Windows COM object saves some values
+in a buffer and transfers them after firing the DataReady event.
+State: I have no idea how to use this event.
+
+- Immediate mode:
+The Windows COM object tries to transfer the data after each trigger. According to doc
+this should work at up to 100 Hz. Sometimes the data contains also pulse repetition rate information.
+These are at the positions where the status tuple gives 0x050000 (or 327680 in decimal) and it's
+never the first position. For the moment this information is discarded
+
+State: This works now. Best first push the 'single grab' button anyway.
+
 * **xxx**: control of xxx 0D detector
 
 Viewer1D

@@ -27,6 +27,7 @@ class Ophir1EnergyMeter:  # Works if there is only ONE powermeter connected
         self._wavelength_list = None
         self._wavelength_idx = None
         self._started = False
+        self._ti_out = False
 
     def open_communication(self):
         """
@@ -88,20 +89,35 @@ class Ophir1EnergyMeter:  # Works if there is only ONE powermeter connected
         return
 
     def get_data_1meas(self):
-        print('get_data_1meas called')
+        print('----\nget_data_1meas called')
         if not self._started:
             self._ophir_com.StartStream(self._oph_device_handle, 0)  # start measuring
             self._started = True
             print('started stream')
 
+        # There is also a DataReady event that COM object fires but no idea how tu use it.
+
         data = self._ophir_com.GetData(self._oph_device_handle, 0)
-        if len(data[0]) > 0:  # if any data available, print the first one from the batch
-            print(
-                'Reading = {0}, TimeStamp = {1}, Status = {2} '.format(
-                    data[0][0], data[1][0], data[2][0]))
+        ti_out = 10  # seconds
+        self._ti_out = False
+        start_time = time.time()
+        while len(data[0]) == 0 and not self._ti_out:
+            time.sleep(20e-3)  # wait a little for data (doc says "up to" 100 hz)
+            data = self._ophir_com.GetData(self._oph_device_handle, 0)
+            self._ti_out = time.time() - start_time > ti_out
+
+        if self._ti_out:
+            print('time out occured in get_data_1meas')
+
+        print(f"hw: {data=}")  # has this format ((), (), ()) triple of tuples
+        """print(
+            'Reading = {0}, TimeStamp = {1}, Status = {2} '.format(
+                data[0][0], data[1][0], data[2][0]))"""
+        if len(data[0]) > 0:
             return data[0][0]
         else:
             return None
+
 
     def stop_streams(self):
         self._ophir_com.StopAllStreams()
