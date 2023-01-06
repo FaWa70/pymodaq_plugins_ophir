@@ -40,15 +40,6 @@ Authors
 =======
 
 * Frank Wagner  (frank.wagner@fresnel.fr)
-* Other author (myotheremail@xxx.org)
-
-.. if needed use this field
-
-    Contributors
-    ============
-
-    * First Contributor
-    * Other Contributors
 
 Instruments
 ===========
@@ -59,7 +50,7 @@ Viewer0D
 ++++++++
 
 * **Ophir1EnergyMeter**: Control of Ophir Laser Energy Meter 0D detector
-(Tested with a Nova II console and pyroelectric detectors)
+(Tested with a Nova II console and pyroelectric detectors connected using USB)
 
 There is one Git branch for each stream mode:
 
@@ -68,6 +59,13 @@ The Windows COM object tries to transfer the data after each trigger. According 
 this should work at up to 100 Hz. Sometimes the data contains also pulse repetition rate information.
 These are at the positions where the status tuple gives 0x050000 (or 327680 in decimal) and it's
 never the first position. For the moment this information is discarded
+
+*State:* This works now. Best first push the 'single grab' button anyway.
+
+- Legacy mode:
+The Windows COM object just communicates as an old com port sending and receiving
+strings of characters. The response strings then need to be interpreted by the program
+and converted to numbers. This is easy and works probably the best.
 
 *State:* This works now. Best first push the 'single grab' button anyway.
 
@@ -80,11 +78,6 @@ and throw away all but the first data entry. Many calls of GetData result in Non
 which seems to be ok for the display, but I don't know what the h5 file looks like.
 If a wait time is used in the general parameters,
 it works more or less. (No idea how many pulses are missing.)
-
-- Legacy mode:
-The Windows COM object just communicates as an old com port sending and receiving
-strings of characters. The response strings then need to be interpreted by the program
-and converted to numbers.
 
 * **xxx**: control of xxx 0D detector
 

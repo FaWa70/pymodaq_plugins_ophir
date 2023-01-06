@@ -26,7 +26,7 @@ class Ophir1EnergyMeter:  # Works if there is only ONE powermeter connected
         self._range_idx = None
         self._wavelength_list = None
         self._wavelength_idx = None
-        self._started = False
+        self._reply_old = ""
         self._ti_out = False
 
     def open_communication(self):
@@ -49,6 +49,7 @@ class Ophir1EnergyMeter:  # Works if there is only ONE powermeter connected
                 print(f"{_dinfo=}")
                 self._oph_device_name = _dinfo[0]
                 self._oph_exists = self._ophir_com.IsSensorExists(self._oph_device_handle, 0)
+                # All below could be done with legacy mode (write / read  mode)
                 if self._oph_exists:
                     # Get the name of the sensor (attached on channel 0)
                     _sinfo = self._ophir_com.GetSensorInfo(self._oph_device_handle, 0)
@@ -84,40 +85,49 @@ class Ophir1EnergyMeter:  # Works if there is only ONE powermeter connected
         self._ophir_com = None
         return True
 
-    def set_immediate_mode(self):
-        self._ophir_com.ConfigureStreamMode(self._oph_device_handle, 0, 2, 1)
-        return
+    def str_2_num(self, s):
+        if s[0] == "*":
+            status_ok = True
+            val = float(s[1:-1])
+        else:
+            status_ok = False
+            val = -10
+        return status_ok, val
 
     def get_data_1meas(self):
         print('----\nget_data_1meas called')
-        if not self._started:
-            self._ophir_com.StartStream(self._oph_device_handle, 0)  # start measuring
-            self._started = True
-            print('started stream')
 
-        # There is also a DataReady event that COM object fires but no idea how tu use it.
-
-        data = self._ophir_com.GetData(self._oph_device_handle, 0)
+        self._ophir_com.Write(self._oph_device_handle, "SE")  # send energy
+        # This sends the last measured energy. Duplicate readings arrive if the
+        # reading rate is faster than the laser pulse repetition rate.
+        # Some intermediate pulses may be lost if the PRR is too fast (no idea about the limit)
+        reply = self._ophir_com.Read(self._oph_device_handle)
+        status_ok, data = self.str_2_num(reply)
+        # Avoid duplicate readings
         ti_out = 10  # seconds
         self._ti_out = False
         start_time = time.time()
-        while len(data[0]) == 0 and not self._ti_out:
-            time.sleep(20e-3)  # wait a little for data (doc says "up to" 100 hz)
-            data = self._ophir_com.GetData(self._oph_device_handle, 0)
+        while self._reply_old == reply and not self._ti_out:
+            time.sleep(50e-3)  # wait a little for data
             self._ti_out = time.time() - start_time > ti_out
+            self._ophir_com.Write(self._oph_device_handle, "SE")
+            reply = self._ophir_com.Read(self._oph_device_handle)
+            # One could also ask repeatedly for the energy-flag (EF)
+            # and read the value only if the reply is 1. This would
+            # not exclude two successive pulses of same energy
+
+        if reply[0] != "*":  # avoids calling str_2_num in the loop
+            self._ti_out = True
+            # *OVER is the reply for overrange values
 
         if self._ti_out:
-            print('time out occured in get_data_1meas')
-
-        print(f"hw: {data=}")  # has this format ((), (), ()) triple of tuples
-        """print(
-            'Reading = {0}, TimeStamp = {1}, Status = {2} '.format(
-                data[0][0], data[1][0], data[2][0]))"""
-        if len(data[0]) > 0:
-            return data[0][0]
-        else:
+            print('time out or error occured in get_data_1meas')
             return None
-
+        print(reply[:-1])
+        self._reply_old = reply
+        status_ok, data = self.str_2_num(reply)
+        print(f"hw: {data=}")  # Is just the energy in Joules
+        return data
 
     def stop_streams(self):
         self._ophir_com.StopAllStreams()
@@ -220,6 +230,5 @@ if __name__ == '__main__':
         time.sleep(0.8)  # wait a little for data
         dattta = ophir_1_powermeter.get_data_1meas()
         print(dattta)
-    ophir_1_powermeter.stop_streams()
     ophir_1_powermeter.close_communication()
 

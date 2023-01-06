@@ -71,8 +71,6 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
             self.settings.child('m_range').setValue(self.controller.range)  # display this item
             # self.settings.child('peak_amp').setValue(self.controller.amplitude)  # float
 
-            self.controller.set_immediate_mode()
-
             self.data_grabed_signal_temp.emit(
                 [DataFromPlugins(name='Pyro', data=[np.array([0])],
                                  dim='Data0D', labels=['pyro1'])]
