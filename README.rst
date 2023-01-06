@@ -63,18 +63,28 @@ Viewer0D
 
 There is one Git branch for each stream mode:
 
-- Standard mode:
-The Windows COM object saves some values
-in a buffer and transfers them after firing the DataReady event.
-State: I have no idea how to use this event.
-
 - Immediate mode:
 The Windows COM object tries to transfer the data after each trigger. According to doc
 this should work at up to 100 Hz. Sometimes the data contains also pulse repetition rate information.
 These are at the positions where the status tuple gives 0x050000 (or 327680 in decimal) and it's
 never the first position. For the moment this information is discarded
 
-State: This works now. Best first push the 'single grab' button anyway.
+*State:* This works now. Best first push the 'single grab' button anyway.
+
+- Standard mode:
+The Windows COM object saves some values
+in a buffer and transfers them after firing the DataReady event.
+
+*State:* I have no idea how to use this event. For the moment I just call the GetData method
+and throw away all but the first data entry. Many calls of GetData result in None being returned
+which seems to be ok for the display, but I don't know what the h5 file looks like.
+If a wait time is used in the general parameters,
+it works more or less. (No idea how many pulses are missing.)
+
+- Legacy mode:
+The Windows COM object just communicates as an old com port sending and receiving
+strings of characters. The response strings then need to be interpreted by the program
+and converted to numbers.
 
 * **xxx**: control of xxx 0D detector
 
