@@ -1,0 +1,1 @@
+For 32-bit applications (running on 32-bit or 64-bit Windows)

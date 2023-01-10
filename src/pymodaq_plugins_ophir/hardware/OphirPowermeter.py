@@ -3,7 +3,7 @@
 # Uses pywin32  # Python extensions for MS Win. Provides access to much of the Win32 API,
 #               # the ability to create and use COM objects ...
 import win32com.client  # conda install -c anaconda pywin32
-import pythoncom
+import pythoncom  # for having the COM object available in all threads
 import traceback
 import time
 

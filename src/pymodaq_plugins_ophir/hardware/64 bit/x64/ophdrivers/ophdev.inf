@@ -1,0 +1,112 @@
+;
+;
+; Installs Ophir devices with WinUsb
+;
+
+[Version]
+Signature = "$Windows NT$"
+Class     = OphirMeasurementDevice
+ClassGUID = {06D84D49-6AA6-47dd-AE08-C1168C4C5C41}
+Provider  = %ManufacturerName%
+CatalogFile = ophdev.cat
+DriverVer=03/15/2021,3.61.0.0 ; version number chosen to match version of StarLab this driver was first released with
+
+; ========== Manufacturer/Models sections ===========
+
+[Manufacturer]
+%ManufacturerName% = Standard,NTamd64.6.0,NTx86.6.0
+
+[Standard.NTamd64.6.0] ; Vista and later
+"USBI"=USB_Install, USB\VID_0BD3&PID_0222
+"Nova2"=USB_Install, USB\VID_0BD3&PID_0333
+"Vega"=USB_Install, USB\VID_0BD3&PID_0334
+"Juno"=USB_Install, USB\VID_0BD3&PID_0777
+"StarLite"=USB_Install, USB\VID_0BD3&PID_0345
+"843-R-USB"=USB_Install, USB\VID_0BD3&PID_E345
+"StarBright"=USB_Install, USB\VID_0BD3&PID_0346
+"1919-R"=USB_Install, USB\VID_0BD3&PID_E346
+"841-PE-USB"=USB_Install, USB\VID_0BD3&PID_E501
+"844-PE-USB"=USB_Install, USB\VID_0BD3&PID_E502
+"Juno+"=USB_Install, USB\VID_0BD3&PID_0502
+"Centauri"=USB_Install, USB\VID_0BD3&PID_0790
+"Ariel"=USB_Install, USB\VID_0BD3&PID_0360
+"Ariel (charging only)"=USB_Install_charging, USB\VID_0BD3&PID_0361
+"x938"=USB_Install_newport, USB\VID_0BD3&PID_E794
+
+[Standard.NTx86.6.0] ; Vista and later
+"USBI"=USB_Install, USB\VID_0BD3&PID_0222
+"Nova2"=USB_Install, USB\VID_0BD3&PID_0333
+"Vega"=USB_Install, USB\VID_0BD3&PID_0334
+"Juno"=USB_Install, USB\VID_0BD3&PID_0777
+"StarLite"=USB_Install, USB\VID_0BD3&PID_0345
+"843-R-USB"=USB_Install, USB\VID_0BD3&PID_E345
+"StarBright"=USB_Install, USB\VID_0BD3&PID_0346
+"1919-R"=USB_Install, USB\VID_0BD3&PID_E346
+"841-PE-USB"=USB_Install, USB\VID_0BD3&PID_E501
+"844-PE-USB"=USB_Install, USB\VID_0BD3&PID_E502
+"Juno+"=USB_Install, USB\VID_0BD3&PID_0502
+"Centauri"=USB_Install, USB\VID_0BD3&PID_0790
+"Ariel"=USB_Install, USB\VID_0BD3&PID_0360
+"Ariel (charging only)"=USB_Install_charging, USB\VID_0BD3&PID_0361
+"x938"=USB_Install_newport, USB\VID_0BD3&PID_E794
+
+; ========== Class definition ===========
+
+[ClassInstall32]
+AddReg = ClassInstall_AddReg
+
+[ClassInstall_AddReg]
+HKR,,,,%ClassName%
+HKR,,NoInstallClass,,1
+HKR,,IconPath,%REG_MULTI_SZ%,"%systemroot%\system32\setupapi.dll,-20"
+HKR,,LowerLogoVersion,,5.2
+
+; =================== Installation ===================
+
+; Vista and later
+
+[USB_Install]
+Include = winusb.inf
+Needs   = WINUSB.NT
+
+[USB_Install.Services]
+Include = winusb.inf
+Needs   = WINUSB.NT.Services
+
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,%REG_MULTI_SZ%,%OphirMeasurementDeviceInterface%,%NIVISAInterface%
+
+[USB_Install_charging]
+Include = winusb.inf
+Needs   = WINUSB.NT
+
+[USB_Install_charging.Services]
+Include = winusb.inf
+Needs   = WINUSB.NT.Services
+
+[USB_Install_newport]
+Include = winusb.inf
+Needs   = WINUSB.NT
+
+[USB_Install_newport.Services]
+Include = winusb.inf
+Needs   = WINUSB.NT.Services
+
+[USB_Install_newport.HW]
+AddReg=Dev_AddReg_newport
+
+[Dev_AddReg_newport]
+HKR,,DeviceInterfaceGUIDs,%REG_MULTI_SZ%,%OphirMeasurementDeviceInterface%,%NIVISAInterface%,%NewportInterface%
+
+; =================== Strings ===================
+
+[Strings]
+ManufacturerName="Ophir Optronics Solutions"
+ClassName="Ophir Measurement devices"
+REG_MULTI_SZ = 0x00010000
+OphirMeasurementDeviceInterface = "{3E0EE3A4-5F0E-40E9-94A1-5F0711CE2517}"
+NIVISAInterface = "{761ED34A-CCFA-416b-94BB-33486DB1F5D5}"
+NewportInterface = "{56AC4E2C-9D3B-4a6c-BF25-B3BD6E44FC00}"

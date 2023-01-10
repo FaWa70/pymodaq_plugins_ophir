@@ -1,0 +1,60 @@
+;
+;
+; Installs Ophir devices with WinUsb
+;
+
+[Version]
+Signature = "$Windows NT$"
+Class     = OphirMeasurementDevice
+ClassGUID = {06D84D49-6AA6-47dd-AE08-C1168C4C5C41}
+Provider  = %ManufacturerName%
+CatalogFile = pulsar.cat
+DriverVer=12/27/2018,3.40.0.0 ; version number chosen to match version of StarLab this driver was first released with
+
+; ========== Manufacturer/Models sections ===========
+
+[Manufacturer]
+%ManufacturerName% = Standard,NTamd64.6.0,NTx86.6.0
+
+[Standard.NTamd64.6.0] ; Vista and later
+"Pulsar"=USB_Install, USB\VID_0BD3&PID_0444
+
+[Standard.NTx86.6.0] ; Vista and later
+"Pulsar"=USB_Install, USB\VID_0BD3&PID_0444
+
+; ========== Class definition ===========
+
+[ClassInstall32]
+AddReg = ClassInstall_AddReg
+
+[ClassInstall_AddReg]
+HKR,,,,%ClassName%
+HKR,,NoInstallClass,,1
+HKR,,IconPath,%REG_MULTI_SZ%,"%systemroot%\system32\setupapi.dll,-20"
+HKR,,LowerLogoVersion,,5.2
+
+; =================== Installation ===================
+
+; Vista and later
+
+[USB_Install]
+Include = winusb.inf
+Needs   = WINUSB.NT
+
+[USB_Install.Services]
+Include = winusb.inf
+Needs   = WINUSB.NT.Services
+
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,%REG_MULTI_SZ%,%OphirMeasurementDeviceInterface%
+
+; =================== Strings ===================
+
+[Strings]
+ManufacturerName="Ophir Optronics Solutions"
+ClassName="Ophir Measurement devices"
+REG_MULTI_SZ = 0x00010000
+OphirMeasurementDeviceInterface = "{3E0EE3A4-5F0E-40E9-94A1-5F0711CE2517}"
