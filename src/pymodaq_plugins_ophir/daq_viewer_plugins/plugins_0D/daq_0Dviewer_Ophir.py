@@ -96,9 +96,9 @@ class DAQ_0DViewer_Ophir(DAQ_Viewer_base):
         kwargs: dict
             others optional arguments
         """
-        # synchrone version (blocking function)
+        # synchronous version (blocking function)
         data_tot = self.controller.get_data_1meas()
-        print(data_tot)
+        print(f"ODv: {data_tot=}")
         self.data_grabed_signal.emit([DataFromPlugins(name='Pyro', data=[np.array([data_tot])],
                                                       dim='Data0D', labels=['pyro1'])])
 
