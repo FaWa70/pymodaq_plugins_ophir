@@ -18,7 +18,22 @@ pymodaq_plugins_ophir (Nova II console)
 Set of PyMoDAQ plugins for instruments from Ophir (www.ophiropt.com).
 
 Restrictions
+============
+I only tested this on Windows 10. Probabaly it works on other versions of Windows too.
+But, as the communication is made using a COM object from teh Win32 API, I doubt that
+this works on Linux or Mac.
 
+Installing the Driver and necessary Python packages
+===================================================
+I installed The Starlab 3.80 software from Ophir. This installed and registered the
+`OphirLMMeasurement.dll`. A more detailed description of the process and how it can
+be transferred to another computer without installing Starlab is given in chapter 3
+of the `OphirLMMeasurement COM Object.doc` file that is provided iin the `\hardware`
+subdirectory.
+
+Python can talk with the WIN32 API COM object only if the `pywin32` package is installed.
+I installed it using conda (conda install -c anaconda pywin32)
+but I think it will work similarly with pip.
 
 Authors
 =======
