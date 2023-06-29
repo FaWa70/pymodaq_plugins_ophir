@@ -26,6 +26,8 @@ class Ophir1EnergyMeter:  # Works if there is only ONE powermeter connected
         self._range_idx = None
         self._wavelength_list = None
         self._wavelength_idx = None
+        self._reply_old = ""
+        self._ti_out = False
         self._started = False
 
     def open_communication(self):
@@ -48,6 +50,7 @@ class Ophir1EnergyMeter:  # Works if there is only ONE powermeter connected
                 print(f"{_dinfo=}")
                 self._oph_device_name = _dinfo[0]
                 self._oph_exists = self._ophir_com.IsSensorExists(self._oph_device_handle, 0)
+                # All below could be done with legacy mode (write / read  mode)
                 if self._oph_exists:
                     # Get the name of the sensor (attached on channel 0)
                     _sinfo = self._ophir_com.GetSensorInfo(self._oph_device_handle, 0)
