@@ -93,8 +93,7 @@ class Ophir1EnergyMeter:  # Works if there is only ONE powermeter connected
         data = self._ophir_com.GetData(self._oph_device_handle, 0)
         if len(data[0]) > 0:  # if any data available, print the first one from the batch
             print(
-                'Reading = {0}, TimeStamp = {1}, Status = {2} '.format(
-                    data[0][0], data[1][0], data[2][0]))
+                f'Reading = {data[0]}, TimeStamp = {data[1]}, Status = {data[2]} ')
             return data[0][0]
         else:
             return None
